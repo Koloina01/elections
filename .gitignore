@@ -1,0 +1,8 @@
+/src/main/resources/.env
+/target/
+*.log
+*.class
+*.iml
+/.idea/
+/.vscode/
+.DS_Store
