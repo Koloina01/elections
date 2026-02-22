@@ -18,3 +18,7 @@ CREATE TABLE vote (
 );
 
 select count(id) as total_votes from vote;
+
+select vote_type , count(id)  as nombre_votes from vote group by vote_type
+order by case vote_type when 'VALID' then 1 when 'BLANK' then 2
+when 'NULL' then 3 end;
