@@ -125,4 +125,33 @@ public class DataRetriever {
             throw new RuntimeException("Error computing vote summary", e);
         }
     }
+
+    public double computeTurnoutRate() {
+        String sql = """
+            SELECT
+                (SELECT COUNT(id) FROM vote) AS votes_count,
+                (SELECT COUNT(id) FROM voter) AS total_voters
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                int votesCount = rs.getInt("votes_count");
+                int totalVoters = rs.getInt("total_voters");
+
+                if (totalVoters == 0) {
+                    return 0.0;
+                }
+
+                return (double) votesCount / totalVoters * 100;
+            } else {
+                return 0.0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error computing turnout rate", e);
+        }
+    }
 }
