@@ -31,3 +31,7 @@ select sum(case when vote_type = 'VALID' then 1 else 0 end) as valid_count,
 sum(case when vote_type = 'BLANK' then 1 else 0 end) as blank_count,
 sum(case when vote_type = 'NULL' then 1 else 0 end) as null_count
 from vote;
+
+select 
+    (select count(id) from vote) as votes_count,
+    (select count(id) from voter) as total_voters;
