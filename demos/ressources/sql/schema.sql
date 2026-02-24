@@ -22,3 +22,7 @@ select count(id) as total_votes from vote;
 select vote_type , count(id)  as nombre_votes from vote group by vote_type
 order by case vote_type when 'VALID' then 1 when 'BLANK' then 2
 when 'NULL' then 3 end;
+
+select c.name as candidate_name, count(v.id) as valid_count from candidate c
+left join vote v on c.id = v.candidate_id and v.vote_type = 'VALID'
+group by c.name order by c.name;
