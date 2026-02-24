@@ -26,3 +26,8 @@ when 'NULL' then 3 end;
 select c.name as candidate_name, count(v.id) as valid_count from candidate c
 left join vote v on c.id = v.candidate_id and v.vote_type = 'VALID'
 group by c.name order by c.name;
+
+select sum(case when vote_type = 'VALID' then 1 else 0 end) as valid_count,
+sum(case when vote_type = 'BLANK' then 1 else 0 end) as blank_count,
+sum(case when vote_type = 'NULL' then 1 else 0 end) as null_count
+from vote;
