@@ -96,4 +96,33 @@ public class DataRetriever {
 
         return results;
     }
+
+    public VoteSummary computeVoteSummary() {
+        String sql = """
+                    SELECT
+                        SUM(CASE WHEN vote_type = 'VALID' THEN 1 ELSE 0 END) AS valid_count,
+                        SUM(CASE WHEN vote_type = 'BLANK' THEN 1 ELSE 0 END) AS blank_count,
+                        SUM(CASE WHEN vote_type = 'NULL' THEN 1 ELSE 0 END) AS null_count
+                    FROM vote
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                int validCount = rs.getInt("valid_count");
+                int blankCount = rs.getInt("blank_count");
+                int nullCount = rs.getInt("null_count");
+
+                return new VoteSummary(validCount, blankCount, nullCount);
+            } else {
+
+                return new VoteSummary(0, 0, 0);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error computing vote summary", e);
+        }
+    }
 }
