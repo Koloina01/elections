@@ -35,3 +35,14 @@ from vote;
 select 
     (select count(id) from vote) as votes_count,
     (select count(id) from voter) as total_voters;
+
+select 
+            c.name as candidate_name,
+            count(v.id) as valid_vote_count
+        from candidate c
+        left join vote v
+            on c.id = v.candidate_id
+            and v.vote_type = 'VALID'
+        group by c.name
+        order by valid_vote_count desc
+        limit 1;
