@@ -128,14 +128,14 @@ public class DataRetriever {
 
     public double computeTurnoutRate() {
         String sql = """
-            SELECT
-                (SELECT COUNT(id) FROM vote) AS votes_count,
-                (SELECT COUNT(id) FROM voter) AS total_voters
-        """;
+                    SELECT
+                        (SELECT COUNT(id) FROM vote) AS votes_count,
+                        (SELECT COUNT(id) FROM voter) AS total_voters
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             if (rs.next()) {
                 int votesCount = rs.getInt("votes_count");
@@ -152,6 +152,39 @@ public class DataRetriever {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error computing turnout rate", e);
+        }
+    }
+
+    public ElectionResult findWinner() {
+
+        String sql = """
+                    SELECT
+                        c.name AS candidate_name,
+                        COUNT(v.id) AS valid_vote_count
+                    FROM candidate c
+                    LEFT JOIN vote v
+                        ON c.id = v.candidate_id
+                        AND v.vote_type = 'VALID'
+                    GROUP BY c.name
+                    ORDER BY valid_vote_count DESC
+                    LIMIT 1
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                String name = rs.getString("candidate_name");
+                int count = rs.getInt("valid_vote_count");
+
+                return new ElectionResult(name, count);
+            } else {
+                return null; // aucun candidat
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding election winner", e);
         }
     }
 }
