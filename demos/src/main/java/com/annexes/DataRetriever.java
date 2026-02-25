@@ -180,7 +180,7 @@ public class DataRetriever {
 
                 return new ElectionResult(name, count);
             } else {
-                return null; // aucun candidat
+                return null; 
             }
 
         } catch (SQLException e) {
